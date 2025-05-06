@@ -38,6 +38,7 @@ class OrcamentoForm(forms.ModelForm):
     class Meta:
         model = Orcamento
         fields = '__all__'
+        exclude = ['responsavel', 'data_cadastro']
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
             'veiculo': forms.Select(attrs={'class': 'form-select'}),

@@ -76,9 +76,17 @@ def novo_orcamento(request):
             orcamento.save()
             messages.success(request, "Orçamento criado com sucesso!")
             return redirect('lista_orcamentos')
+        else:
+            print("\n=== Erros do formulário ===")  # Debug
+            print(form.errors)  # Mostra todos os erros de validação
     else:
         form = OrcamentoForm()
-    return render(request, "gestao/orcamento/formulario.html", {'form': form, 'titulo': 'Novo Orçamento'})
+    
+    return render(request, "gestao/orcamento/formulario.html", {
+        'form': form,
+        'titulo': 'Novo Orçamento'
+    })
+
 
 @login_required
 def editar_veiculo(request, id):
@@ -113,6 +121,8 @@ def editar_orcamento(request, id):
         form = OrcamentoForm(request.POST, instance=orcamento)
         if form.is_valid():
             form.save()
+            orcamento.responsavel = request.user
+            orcamento.save()
             messages.success(request, "Orçamento atualizado com sucesso!")
             return redirect('lista_orcamentos')
     else:
