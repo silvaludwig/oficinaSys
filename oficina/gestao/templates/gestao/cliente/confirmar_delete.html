@@ -1,0 +1,46 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}Confirmar Exclusão de Cliente{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Confirmar Exclusão</h5>
+            </div>
+            <div class="card-body">
+                <p>Tem certeza que deseja excluir o cliente abaixo e todos os seus dados associados?</p>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>{{ objeto.nome }}</h5>
+                        <p class="mb-1">CPF: {{ objeto.cpf }}</p>
+                        <p class="mb-0">Email: {{ objeto.email }}</p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>Atenção!</strong> Esta ação também excluirá:
+                    <ul class="mb-0">
+                        <li>{{ objeto.veiculos.count }} veículo(s)</li>
+                        <li>{{ objeto.orcamentos.count }} orçamento(s)</li>
+                    </ul>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'detalhe_cliente' objeto.id %}" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Confirmar Exclusão
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "gestao/base.html" %} {% block title %}Dashboard{% endblock %}
+{%block content%}
+<div class="row">
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-primary h-100">
+      <div class="card-body">
+        <h5 class="card-title">Clientes</h5>
+        <h2 class="card-text">{{ total_clientes }}</h2>
+        <a href="{% url 'lista_clientes' %}" class="text-white">Ver todos</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-success h-100">
+      <div class="card-body">
+        <h5 class="card-title">Veículos</h5>
+        <h2 class="card-text">{{ total_veiculos }}</h2>
+        <a href="{% url 'lista_veiculos' %}" class="text-white">Ver todos</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-info h-100">
+      <div class="card-body">
+        <h5 class="card-title">Orçamentos</h5>
+        <h2 class="card-text">{{ total_orcamentos }}</h2>
+        <a href="{% url 'lista_orcamentos' %}" class="text-white">Ver todos</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-4">
+    <div class="card text-white bg-warning h-100">
+      <div class="card-body">
+        <h5 class="card-title">Pendentes</h5>
+        <h2 class="card-text">{{ orcamentos_pendentes }}</h2>
+        <a
+          href="{% url 'lista_orcamentos' %}?status=pendente"
+          class="text-white"
+          >Ver pendentes</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>Últimos Orçamentos</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group">
+          {% for orcamento in ultimos_orcamentos %}
+          <a
+            href="{% url 'detalhe_orcamento' orcamento.id %}"
+            class="list-group-item list-group-item-action"
+          >
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">
+                #{{ orcamento.id }} - {{ orcamento.cliente.nome }}
+              </h6>
+              <small>R$ {{ orcamento.valor }}</small>
+            </div>
+            <small class="text-muted"
+              >{{ orcamento.veiculo.marca }} {{ orcamento.veiculo.modelo
+              }}</small
+            >
+          </a>
+          {% empty %}
+          <div class="list-group-item">Nenhum orçamento recente</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5>Últimos Clientes</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group">
+          {% for cliente in ultimos_clientes %}
+          <a
+            href="{% url 'detalhe_cliente' cliente.id %}"
+            class="list-group-item list-group-item-action"
+          >
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">{{ cliente.nome }}</h6>
+              <small>{{ cliente.data_cadastro|date:"d/m/Y" }}</small>
+            </div>
+            <small class="text-muted">{{ cliente.email }}</small>
+          </a>
+          {% empty %}
+          <div class="list-group-item">Nenhum cliente recente</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ titulo }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.marca.id_for_label }}" class="form-label">Marca</label>
+                            {{ form.marca }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.modelo.id_for_label }}" class="form-label">Modelo</label>
+                            {{ form.modelo }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.ano_fabricacao.id_for_label }}" class="form-label">Ano</label>
+                            {{ form.ano_fabricacao }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.placa.id_for_label }}" class="form-label">Placa</label>
+                            {{ form.placa }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.motor.id_for_label }}" class="form-label">Motor</label>
+                            {{ form.motor }}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.cliente.id_for_label }}" class="form-label">Proprietário</label>
+                            {{ form.cliente }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Salvar
+                        </button>
+                        <a href="{% if form.instance.pk %}{% url 'detalhe_veiculo' form.instance.pk %}{% else %}{% url 'lista_veiculos' %}{% endif %}" 
+                           class="btn btn-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

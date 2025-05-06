@@ -1,0 +1,79 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}Relatório de Orçamentos{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        .no-print {
+            display: none;
+        }
+        body {
+            font-size: 11pt;
+        }
+        .table {
+            font-size: 10pt;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Relatório de Orçamentos</h5>
+        <div class="no-print">
+            <button onclick="window.print()" class="btn btn-secondary btn-sm me-2">
+                <i class="bi bi-printer"></i> Imprimir
+            </button>
+            <a href="{% url 'lista_orcamentos' %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#ID</th>
+                        <th>Cliente</th>
+                        <th>Veículo</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Pagamento</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orcamento in orcamentos %}
+                    <tr>
+                        <td>{{ orcamento.id }}</td>
+                        <td>{{ orcamento.cliente.nome }}</td>
+                        <td>{{ orcamento.veiculo.marca }} {{ orcamento.veiculo.modelo }}</td>
+                        <td>R$ {{ orcamento.valor }}</td>
+                        <td>{{ orcamento.get_status_display }}</td>
+                        <td>
+                            {% if orcamento.foi_pago %}
+                            Pago ({{ orcamento.get_forma_pagamento_display }})
+                            {% else %}
+                            Pendente
+                            {% endif %}
+                        </td>
+                        <td>{{ orcamento.data_cadastro|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-active">
+                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                        <td><strong>R$ {{ total }}</strong></td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer text-muted no-print">
+        <small>Relatório gerado em {% now "d/m/Y H:i" %}</small>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}Confirmar Exclusão de Orçamento{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Confirmar Exclusão</h5>
+            </div>
+            <div class="card-body">
+                <p>Tem certeza que deseja excluir permanentemente este orçamento?</p>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Orçamento #{{ objeto.id }}</h5>
+                        <p class="mb-1">Cliente: {{ objeto.cliente.nome }}</p>
+                        <p class="mb-1">Veículo: {{ objeto.veiculo.marca }} {{ objeto.veiculo.modelo }}</p>
+                        <p class="mb-0">Valor: R$ {{ objeto.valor }}</p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'detalhe_orcamento' objeto.id %}" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Confirmar Exclusão
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Atualiza a lista de veículos quando o cliente é selecionado
+    const clienteSelect = document.getElementById('id_cliente');
+    const veiculoSelect = document.getElementById('id_veiculo');
+    
+    clienteSelect.addEventListener('change', function() {
+        const clienteId = this.value;
+        if (clienteId) {
+            fetch(`/api/veiculos/?cliente_id=${clienteId}`)
+                .then(response => response.json())
+                .then(data => {
+                    veiculoSelect.innerHTML = '';
+                    data.forEach(veiculo => {
+                        const option = document.createElement('option');
+                        option.value = veiculo.id;
+                        option.textContent = `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa || 'Sem placa'})`;
+                        veiculoSelect.appendChild(option);
+                    });
+                });
+        } else {
+            veiculoSelect.innerHTML = '<option value="">---------</option>';
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ titulo }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.cliente.id_for_label }}" class="form-label">Cliente</label>
+                            {{ form.cliente }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.veiculo.id_for_label }}" class="form-label">Veículo</label>
+                            {{ form.veiculo }}
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="{{ form.valor.id_for_label }}" class="form-label">Valor (R$)</label>
+                            {{ form.valor }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.forma_pagamento.id_for_label }}" class="form-label">Pagamento</label>
+                            {{ form.forma_pagamento }}
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.data_validade.id_for_label }}" class="form-label">Data de Validade</label>
+                            {{ form.data_validade }}
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check form-switch">
+                                {{ form.foi_pago }}
+                                <label class="form-check-label" for="{{ form.foi_pago.id_for_label }}">Foi pago?</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.observacoes.id_for_label }}" class="form-label">Observações</label>
+                        {{ form.observacoes }}
+                    </div>
+                    
+                    <div class="mt-4 d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Salvar
+                        </button>
+                        <a href="{% if form.instance.pk %}{% url 'detalhe_orcamento' form.instance.pk %}{% else %}{% url 'lista_orcamentos' %}{% endif %}" 
+                           class="btn btn-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

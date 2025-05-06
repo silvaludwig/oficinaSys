@@ -1,0 +1,78 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'index' %}">
+      <i class="bi bi-tools"></i> Oficina Mecânica
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a
+            class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+            href="{% url 'dashboard' %}"
+          >
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link {% if 'clientes' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'lista_clientes' %}"
+          >
+            <i class="bi bi-people"></i> Clientes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link {% if 'veiculos' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'lista_veiculos' %}"
+          >
+            <i class="bi bi-car-front"></i> Veículos
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link {% if 'orcamentos' in request.resolver_match.url_name %}active{% endif %}"
+            href="{% url 'lista_orcamentos' %}"
+          >
+            <i class="bi bi-file-text"></i> Orçamentos
+          </a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+          >
+            <i class="bi bi-person-circle"></i> {{ user.username }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="{% url 'password_change' %}"
+                >Alterar Senha</a
+              >
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
+          </ul>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'login' %}">Entrar</a>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

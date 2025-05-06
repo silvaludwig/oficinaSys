@@ -1,0 +1,84 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}Detalhes do Veículo{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Informações do Veículo</h5>
+                    <div class="btn-group">
+                        <a href="{% url 'editar_veiculo' veiculo.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a href="{% url 'excluir_veiculo' veiculo.id %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Excluir
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Marca:</dt>
+                    <dd class="col-sm-8">{{ veiculo.get_marca_display }}</dd>
+                    
+                    <dt class="col-sm-4">Modelo:</dt>
+                    <dd class="col-sm-8">{{ veiculo.modelo }}</dd>
+                    
+                    <dt class="col-sm-4">Ano:</dt>
+                    <dd class="col-sm-8">{{ veiculo.ano_fabricacao }}</dd>
+                    
+                    <dt class="col-sm-4">Placa:</dt>
+                    <dd class="col-sm-8">{{ veiculo.placa|default:"Não informada" }}</dd>
+                    
+                    <dt class="col-sm-4">Motor:</dt>
+                    <dd class="col-sm-8">{{ veiculo.motor }}</dd>
+                    
+                    <dt class="col-sm-4">Proprietário:</dt>
+                    <dd class="col-sm-8">
+                        <a href="{% url 'detalhe_cliente' veiculo.cliente.id %}">
+                            {{ veiculo.cliente.nome }}
+                        </a>
+                    </dd>
+                    
+                    <dt class="col-sm-4">Cadastrado em:</dt>
+                    <dd class="col-sm-8">{{ veiculo.data_cadastro|date:"d/m/Y H:i" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Histórico de Orçamentos</h5>
+            </div>
+            <div class="card-body">
+                {% if orcamentos %}
+                <div class="list-group">
+                    {% for orcamento in orcamentos %}
+                    <a href="{% url 'detalhe_orcamento' orcamento.id %}" 
+                       class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">#{{ orcamento.id }}</h6>
+                            <small class="text-{% if orcamento.foi_pago %}success{% else %}danger{% endif %}">
+                                R$ {{ orcamento.valor }}
+                            </small>
+                        </div>
+                        <small class="text-muted">
+                            {{ orcamento.data_cadastro|date:"d/m/Y" }} • 
+                            {{ orcamento.get_status_display }}
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info mb-0">Nenhum orçamento registrado para este veículo</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
