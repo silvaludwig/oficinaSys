@@ -1,0 +1,32 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}Logout | Oficina Mecânica{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0 text-center">
+                    <i class="bi bi-box-arrow-left"></i> Sair do Sistema
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <p class="lead">Você foi desconectado com sucesso.</p>
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                
+                <div class="mt-4">
+                    <a href="{% url 'login' %}" class="btn btn-primary">
+                        <i class="bi bi-box-arrow-in-right"></i> Fazer login novamente
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer text-center bg-light">
+                <small class="text-muted">
+                    Sistema de Gestão para Oficina Mecânica &copy; {% now "Y" %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

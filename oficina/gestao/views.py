@@ -9,6 +9,15 @@ from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView
 
+from django.contrib.auth import logout
+from django.views.decorators.http import require_POST
+from django.shortcuts import redirect
+
+@require_POST
+def custom_logout(request):
+    logout(request)
+    messages.success(request, "Você foi desconectado com sucesso.")
+    return redirect('index')
 
 # Views Públicas
 def index(request):

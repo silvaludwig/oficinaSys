@@ -1,0 +1,81 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}Login | Oficina Mecânica{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0 text-center">
+                    <i class="bi bi-shield-lock"></i> Acesso ao Sistema
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Usuário ou senha incorretos. Por favor, tente novamente.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            <i class="bi bi-person-fill"></i> Usuário
+                        </label>
+                        <input type="text" name="username" class="form-control" id="id_username" required>
+                        <div class="invalid-feedback">Por favor, informe seu usuário.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">
+                            <i class="bi bi-key-fill"></i> Senha
+                        </label>
+                        <input type="password" name="password" class="form-control" id="id_password" required>
+                        <div class="invalid-feedback">Por favor, informe sua senha.</div>
+                    </div>
+                    
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-in-right"></i> Entrar
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none">
+                            <i class="bi bi-question-circle"></i> Esqueceu sua senha?
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center bg-light">
+                <small class="text-muted">
+                    Não tem uma conta? <a href="{% url 'cadastro_usuario' %}">Cadastre-se</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validação do formulário
+(function() {
+    'use strict'
+    
+    const forms = document.querySelectorAll('.needs-validation')
+    
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

@@ -5,6 +5,7 @@ from .views import (
     cadastro_usuario,
     BuscaClienteView,
     OrcamentoDetailView,
+    custom_logout,
 )
 
 urlpatterns = [
@@ -41,8 +42,10 @@ urlpatterns = [
     ), name="login"),
     path("accounts/logout/", auth_views.LogoutView.as_view(
         template_name='gestao/auth/logout.html',
-        extra_context={'title': 'Logout'}
+        extra_context={'title': 'Logout'}, 
+        next_page='index'
     ), name="logout"),
+    # path('accounts/logout/', custom_logout, name='logout'),
     path("accounts/password_reset/", auth_views.PasswordResetView.as_view(
         template_name='gestao/auth/password_reset.html',
         email_template_name='gestao/auth/password_reset_email.html',
