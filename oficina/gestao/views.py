@@ -1,17 +1,16 @@
-from django.http import JsonResponse
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
-from .models import Veiculo, Orcamento, Cliente
-from .forms import VeiculoForm, ClienteForm, CadastroUsuarioForm, OrcamentoForm
-from django.db.models import Q
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView
-
-from django.contrib.auth import logout
 from django.views.decorators.http import require_POST
-from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout, authenticate
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from .models import Veiculo, Orcamento, Cliente
+from django.views.generic import ListView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import VeiculoForm, ClienteForm, CadastroUsuarioForm, OrcamentoForm
+
 
 @require_POST
 def custom_logout(request):
@@ -49,25 +48,32 @@ def cadastro_usuario(request):
 # Views Protegidas (requerem login)
 @login_required
 def lista_veiculos(request):
-    veiculos = Veiculo.objects.all().order_by('-id')
+    veiculos = Veiculo.objects.filter(usuario=request.user).order_by('-id')
     return render(request, "gestao/veiculo/lista.html", {'veiculos': veiculos})
 
 @login_required
 def lista_clientes(request): 
-    clientes = Cliente.objects.all().order_by('-id')
+    clientes = Cliente.objects.filter(usuario=request.user).order_by('-id')
     return render(request, "gestao/cliente/lista.html", {'clientes': clientes})
 
 @login_required
 def lista_orcamentos(request): 
-    orcamentos = Orcamento.objects.all().order_by('-data_cadastro')
+    orcamentos = Orcamento.objects.filter(usuario=request.user).order_by('-data_cadastro')
     return render(request, "gestao/orcamento/lista.html", {'orcamentos': orcamentos})
+
+@login_required
+def imprimir_orcamento(request, id):
+    orcamento = get_object_or_404(Orcamento, id=id, usuario=request.user)
+    return render(request, 'gestao/orcamento/imprimir.html', {'orcamento': orcamento})
 
 @login_required
 def novo_veiculo(request):
     if request.method == "POST":
         form = VeiculoForm(request.POST)
         if form.is_valid():
-            veiculo = form.save()
+            veiculo = form.save(commit=False)
+            veiculo.usuario = request.user  # Associa o veículo ao usuário logado
+            veiculo.save()
             messages.success(request, "Veículo cadastrado com sucesso!")
             return redirect('lista_veiculos')
     else:
@@ -79,9 +85,13 @@ def novo_cliente(request):
     if request.method == "POST":
         form = ClienteForm(request.POST)
         if form.is_valid():
-            cliente = form.save()
+            cliente = form.save(commit=False)
+            cliente.usuario = request.user  # Associa o cliente ao usuário logado
+            cliente.save()
             messages.success(request, "Cliente cadastrado com sucesso!")
             return redirect('lista_clientes')
+        else:
+            print(form.errors)  # 👈 Mostra no terminal o motivo da falha
     else:
         form = ClienteForm()
     return render(request, "gestao/cliente/formulario.html", {'form': form, 'titulo': 'Novo Cliente'})
@@ -92,7 +102,7 @@ def novo_orcamento(request):
         form = OrcamentoForm(request.POST)
         if form.is_valid():
             orcamento = form.save(commit=False)
-            orcamento.responsavel = request.user
+            orcamento.usuario = request.user
             orcamento.save()
             messages.success(request, "Orçamento criado com sucesso!")
             return redirect('lista_orcamentos')
@@ -114,7 +124,9 @@ def editar_veiculo(request, id):
     if request.method == "POST":
         form = VeiculoForm(request.POST, instance=veiculo)
         if form.is_valid():
-            form.save()
+            veiculo = form.save(commit=False)
+            veiculo.usuario = request.user  # Atualiza o usuário logado
+            veiculo.save()
             messages.success(request, "Veículo atualizado com sucesso!")
             return redirect('lista_veiculos')
     else:
@@ -127,7 +139,9 @@ def editar_cliente(request, id):
     if request.method == "POST":
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
-            form.save()
+            cliente = form.save(commit=False)
+            cliente.usuario = request.user  # Atualiza o usuário logado
+            cliente.save()
             messages.success(request, "Cliente atualizado com sucesso!")
             return redirect('lista_clientes')
     else:
@@ -140,8 +154,8 @@ def editar_orcamento(request, id):
     if request.method == "POST":
         form = OrcamentoForm(request.POST, instance=orcamento)
         if form.is_valid():
-            form.save()
-            orcamento.responsavel = request.user
+            orcamento = form.save(commit=False)
+            orcamento.usuario = request.user
             orcamento.save()
             messages.success(request, "Orçamento atualizado com sucesso!")
             return redirect('lista_orcamentos')
@@ -151,7 +165,7 @@ def editar_orcamento(request, id):
 
 @login_required
 def excluir_veiculo(request, id):
-    veiculo = get_object_or_404(Veiculo, id=id)
+    veiculo = get_object_or_404(Veiculo, id=id, usuario=request.user)
     if request.method == "POST":
         veiculo.delete()
         messages.success(request, "Veículo excluído com sucesso!")
@@ -160,7 +174,7 @@ def excluir_veiculo(request, id):
 
 @login_required
 def excluir_cliente(request, id):
-    cliente = get_object_or_404(Cliente, id=id)
+    cliente = get_object_or_404(Cliente, id=id, usuario=request.user)
     if request.method == "POST":
         cliente.delete()
         messages.success(request, "Cliente excluído com sucesso!")
@@ -169,7 +183,7 @@ def excluir_cliente(request, id):
 
 @login_required
 def excluir_orcamento(request, id):
-    orcamento = get_object_or_404(Orcamento, id=id)
+    orcamento = get_object_or_404(Orcamento, id=id, usuario=request.user)
     if request.method == "POST":
         orcamento.delete()
         messages.success(request, "Orçamento excluído com sucesso!")
@@ -185,12 +199,15 @@ class BuscaClienteView(LoginRequiredMixin, ListView):
     
     def get_queryset(self):
         query = self.request.GET.get('q')
+        base_query = Cliente.objects.filter(usuario=self.request.user)  # 👈 Filtro essencial
+
         if query:
-            return Cliente.objects.filter(
+            return base_query.filter(
                 Q(nome__icontains=query) |
                 Q(cpf__icontains=query) |
                 Q(email__icontains=query))
-        return Cliente.objects.all().order_by('-data_cadastro')
+        
+        return base_query.order_by('-data_cadastro')
 
 # View detalhada para orçamento
 class OrcamentoDetailView(LoginRequiredMixin, DetailView):
@@ -205,25 +222,10 @@ class OrcamentoDetailView(LoginRequiredMixin, DetailView):
     
 
 @login_required
-def dashboard(request):
-    total_clientes = Cliente.objects.count()
-    total_veiculos = Veiculo.objects.count()
-    total_orcamentos = Orcamento.objects.count()
-    orcamentos_pendentes = Orcamento.objects.filter(status='pendente').count()
-    
-    context = {
-        'total_clientes': total_clientes,
-        'total_veiculos': total_veiculos,
-        'total_orcamentos': total_orcamentos,
-        'orcamentos_pendentes': orcamentos_pendentes,
-    }
-    return render(request, 'gestao/dashboard.html', context)
-
-@login_required
 def detalhe_cliente(request, id):
-    cliente = get_object_or_404(Cliente, id=id)
-    veiculos = cliente.veiculos.all()
-    orcamentos = cliente.orcamentos.all()
+    cliente = get_object_or_404(Cliente, id=id, usuario=request.user)
+    veiculos = cliente.veiculos.filter(usuario=request.user)
+    orcamentos = cliente.orcamentos.filter(usuario=request.user)
     
     return render(request, 'gestao/cliente/detalhe.html', {
         'cliente': cliente,
@@ -233,8 +235,8 @@ def detalhe_cliente(request, id):
 
 @login_required
 def detalhe_veiculo(request, id):
-    veiculo = get_object_or_404(Veiculo, id=id)
-    orcamentos = veiculo.orcamentos.all()
+    veiculo = get_object_or_404(Veiculo, id=id, usuario=request.user)
+    orcamentos = veiculo.orcamentos.filter(usuario=request.user)
     
     return render(request, 'gestao/veiculo/detalhe.html', {
         'veiculo': veiculo,
@@ -243,7 +245,7 @@ def detalhe_veiculo(request, id):
 
 @login_required
 def relatorio_orcamentos(request):
-    orcamentos = Orcamento.objects.all()
+    orcamentos = Orcamento.objects.filter(usuario=request.user)
     total = sum(o.valor for o in orcamentos if o.foi_pago)
     
     return render(request, 'gestao/orcamento/relatorio.html', {
@@ -266,21 +268,40 @@ def api_clientes(request):
     termo = request.GET.get('q')
     if termo:
         clientes = Cliente.objects.filter(
-            Q(nome__icontains=termo) | Q(cpf__icontains=termo))
+            Q(nome__icontains=termo) | Q(cpf__icontains=termo), usuario=request.user)
         results = [{'id': c.id, 'text': f'{c.nome} (CPF: {c.cpf})'} for c in clientes]
         return JsonResponse({'results': results})
     return JsonResponse({'results': []})
 
 # Dashboard View
+# @login_required
+# def dashboard(request):
+#     total_clientes = Cliente.objects.count()
+#     total_veiculos = Veiculo.objects.count()
+#     total_orcamentos = Orcamento.objects.count()
+#     orcamentos_pendentes = Orcamento.objects.filter(status='pendente').count()
+#     ultimos_orcamentos = Orcamento.objects.all().order_by('-data_cadastro')[:5]
+#     ultimos_clientes = Cliente.objects.all().order_by('-data_cadastro')[:5]
+    
+#     context = {
+#         'total_clientes': total_clientes,
+#         'total_veiculos': total_veiculos,
+#         'total_orcamentos': total_orcamentos,
+#         'orcamentos_pendentes': orcamentos_pendentes,
+#         'ultimos_orcamentos': ultimos_orcamentos,
+#         'ultimos_clientes': ultimos_clientes,
+#     }
+#     return render(request, 'gestao/dashboard.html', context)
+
 @login_required
 def dashboard(request):
-    total_clientes = Cliente.objects.count()
-    total_veiculos = Veiculo.objects.count()
-    total_orcamentos = Orcamento.objects.count()
-    orcamentos_pendentes = Orcamento.objects.filter(status='pendente').count()
-    ultimos_orcamentos = Orcamento.objects.all().order_by('-data_cadastro')[:5]
-    ultimos_clientes = Cliente.objects.all().order_by('-data_cadastro')[:5]
-    
+    total_clientes = Cliente.objects.filter(usuario=request.user).count()
+    total_veiculos = Veiculo.objects.filter(usuario=request.user).count()
+    total_orcamentos = Orcamento.objects.filter(usuario=request.user).count()
+    orcamentos_pendentes = Orcamento.objects.filter(usuario=request.user, status='pendente').count()
+    ultimos_orcamentos = Orcamento.objects.filter(usuario=request.user).order_by('-data_cadastro')[:5]
+    ultimos_clientes = Cliente.objects.filter(usuario=request.user).order_by('-data_cadastro')[:5]
+
     context = {
         'total_clientes': total_clientes,
         'total_veiculos': total_veiculos,

@@ -1,0 +1,70 @@
+{% extends "gestao/base.html" %}
+
+{% block title %}Impressão do Orçamento #{{ orcamento.id }}{% endblock %}
+
+{% block content %}
+<style>
+@media print {
+    .no-print {
+        display: none;
+    }
+    body {
+        margin: 0;
+    }
+}
+</style>
+
+<div class="container mt-4">
+    <div class="text-end no-print mb-3">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="bi bi-printer"></i> Imprimir
+        </button>
+        <a href="{% url 'detalhe_orcamento' orcamento.id %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header text-center">
+            <h4 class="mb-0">Orçamento #{{ orcamento.id }}</h4>
+            <small>{{ orcamento.data_cadastro|date:"d/m/Y H:i" }}</small>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <strong>Cliente:</strong> {{ orcamento.cliente.nome }}<br>
+                <strong>CPF:</strong> {{ orcamento.cliente.cpf }}<br>
+                <strong>E-mail:</strong> {{ orcamento.cliente.email|default:"-" }}
+            </div>
+
+            <div class="mb-3">
+                <strong>Veículo:</strong> {{ orcamento.veiculo.marca }} {{ orcamento.veiculo.modelo }}<br>
+                <strong>Placa:</strong> {{ orcamento.veiculo.placa|default:"Não informada" }}<br>
+                <strong>Ano:</strong> {{ orcamento.veiculo.ano_fabricacao }}
+            </div>
+
+            <div class="mb-3">
+                <strong>Valor:</strong> R$ {{ orcamento.valor }}<br>
+                <strong>Status:</strong> {{ orcamento.get_status_display }}<br>
+                <strong>Pagamento:</strong> 
+                {% if orcamento.foi_pago %}
+                    Pago ({{ orcamento.get_forma_pagamento_display }})
+                {% else %}
+                    Pendente
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <strong>Data de Validade:</strong> {{ orcamento.data_validade|date:"d/m/Y" }}<br>
+                <strong>Responsável:</strong> {{ orcamento.usuario.get_full_name|default:orcamento.usuario.username }}
+            </div>
+
+            {% if orcamento.observacoes %}
+            <div class="mt-4">
+                <strong>Observações:</strong>
+                <p class="text-muted">{{ orcamento.observacoes }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

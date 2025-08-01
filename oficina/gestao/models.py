@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 import re
 
 def validate_cpf(value):
@@ -12,6 +13,7 @@ def validate_phone(value):
         raise ValidationError('Telefone deve conter 10 ou 11 dígitos.')
 
 class Cliente(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     nome = models.CharField(max_length=100, null=False, verbose_name="Nome Completo")
     email = models.EmailField(max_length=100, null=False, unique=True)
     cpf = models.CharField(
@@ -56,6 +58,7 @@ class Veiculo(models.Model):
         choices=MARCA_CHOICES,
         verbose_name="Marca do Veículo"
     )
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     modelo = models.CharField(max_length=50, verbose_name="Modelo")
     ano_fabricacao = models.IntegerField(
         null=False,
@@ -107,7 +110,7 @@ class Orcamento(models.Model):
         ("boleto", "Boleto"),
         ("outro", "Outro"),
     ]
-    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     cliente = models.ForeignKey(
         Cliente, 
         on_delete=models.CASCADE,
@@ -145,12 +148,12 @@ class Orcamento(models.Model):
         null=True,
         verbose_name="Observações"
     )
-    responsavel = models.ForeignKey(
-        'auth.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        verbose_name="Responsável"
-    )
+    # responsavel = models.ForeignKey(
+    #     'auth.User',
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     verbose_name="Responsável"
+    # )
 
     class Meta:
         verbose_name = "Orçamento"

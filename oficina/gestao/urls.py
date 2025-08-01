@@ -6,6 +6,7 @@ from .views import (
     BuscaClienteView,
     OrcamentoDetailView,
     custom_logout,
+    imprimir_orcamento,
 )
 
 urlpatterns = [
@@ -33,6 +34,7 @@ urlpatterns = [
     path("orcamentos/editar/<int:id>/", views.editar_orcamento, name="editar_orcamento"),
     path("orcamentos/excluir/<int:id>/", views.excluir_orcamento, name="excluir_orcamento"),
     path("orcamentos/<int:pk>/", OrcamentoDetailView.as_view(), name="detalhe_orcamento"),
+    path("orcamentos/<int:id>/imprimir/", views.imprimir_orcamento, name="imprimir_orcamento"),
     path("orcamentos/relatorio/", views.relatorio_orcamentos, name="relatorio_orcamentos"),
     
     # Autenticação

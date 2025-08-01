@@ -40,7 +40,8 @@ class CadastroUsuarioForm(UserCreationForm):
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ['usuario']  # 👈 exclua o campo usuario
         widgets = {
             'data_nascimento': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -54,7 +55,8 @@ class ClienteForm(forms.ModelForm):
 class VeiculoForm(forms.ModelForm):
     class Meta:
         model = Veiculo
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ['usuario']  # 👈 exclua o campo usuario
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
         }
@@ -62,8 +64,8 @@ class VeiculoForm(forms.ModelForm):
 class OrcamentoForm(forms.ModelForm):
     class Meta:
         model = Orcamento
-        fields = '__all__'
-        exclude = ['responsavel', 'data_cadastro']
+        # fields = '__all__'
+        exclude = ['usuario', 'data_cadastro']
         widgets = {
             'cliente': forms.Select(attrs={'class': 'form-select'}),
             'veiculo': forms.Select(attrs={'class': 'form-select'}),
