@@ -6,11 +6,36 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
 class CadastroUsuarioForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(
+        required=True,
+        label="Email",
+        help_text="Informe um email válido",
+        validators=[validate_email]
+    )
     
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+    
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("Este email já está cadastrado.")
+        return email
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Melhorias nos labels e help texts
+        self.fields['username'].label = "Nome de usuário"
+        self.fields['username'].help_text = "Obrigatório. 150 caracteres ou menos. Letras, números e @/./+/-/_ apenas."
+        self.fields['password1'].help_text = """
+            <ul>
+                <li>Sua senha não pode ser muito parecida com suas outras informações pessoais.</li>
+                <li>Sua senha deve conter pelo menos 8 caracteres.</li>
+                <li>Sua senha não pode ser uma senha comumente usada.</li>
+                <li>Sua senha não pode ser inteiramente numérica.</li>
+            </ul>
+        """
 
 class ClienteForm(forms.ModelForm):
     class Meta:
